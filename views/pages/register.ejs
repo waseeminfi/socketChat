@@ -1,0 +1,57 @@
+<% layout('../layout/oneColumn') -%>
+
+<form class="form-signin" onsubmit="return myFunction(this)" method = "post">
+    <div class="text-center mb-4">
+      <img class="mb-4" src="/assets/logo.png" alt="" width="200" height="90">
+    </div>
+  
+    <div class="form-label-group">
+      <input name="username" type="text" id="inputUserName" class="form-control"  onkeyup="checkUsername()" placeholder="User Name" required autofocus>
+      <label for="inputUserName">User Name</label>
+    </div>
+  
+    <div class="form-label-group">
+      <input name="password" type="password" id="inputPassword" class="form-control" placeholder="Password" required>
+      <label for="inputPassword">Password</label>
+    </div>
+
+    <div class="form-label-group">
+        <input name="conpassword" type="password" id="confirmPassword" class="form-control" placeholder="Confirm Password" required>
+        <label for="inputPassword">Confirm Password</label>
+      </div>
+  
+    
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Submit</button>
+    
+  </form>
+
+  <script>
+   function checkUsername(){
+       let uname = $("#inputUserName").val();
+    jQuery.ajax({
+            type: "GET",
+            url: "/checkUserName/"+uname,
+            success: function (data) {  
+                console.log('data',data)
+                 if(data.result=='error'){
+                     alert('User name already exist')
+                     $("#name").focus();
+                     $("#sbtn").attr('disabled','disabled');
+                 }else{
+                    $("#sbtn").removeAttr('disabled');
+                 } 
+            }  
+        });
+    }
+  
+    function myFunction(form) {
+        password = form.inputPassword.value;
+        cpassword = form.confirmPassword.value;
+        if (password != cpassword) {
+            alert("\nPassword did not match: Please try again...")
+            return false;
+        } else {
+            return true;
+        }
+    }
+  </script>

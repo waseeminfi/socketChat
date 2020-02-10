@@ -1,0 +1,33 @@
+<% layout('../layout/oneColumn') -%>
+
+<form class="form-signin" action="/login" method = "post">
+    <div class="text-center mb-4">
+      <img class="mb-4" src="<%= root %>/assets/logo.png" alt="" width="200" height="90">
+    </div>
+  
+    <div class="form-label-group">
+      <input name="username" type="text" id="inputUserName" class="form-control" placeholder="User Name" required autofocus>
+      <label for="inputUserName">User Name</label>
+    </div>
+  
+    <div class="form-label-group">
+      <input name="password" type="password" id="inputPassword" class="form-control" placeholder="Password" required>
+      <label for="inputPassword">Password</label>
+    </div>
+  
+    <div class="checkbox mb-3">
+      <label>
+        <input type="checkbox" value="remember-me"> Remember me
+      </label>
+    </div>
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+
+    <button class="btn btn-lg btn-primary btn-block" onclick="Redirect()" >Sign Up</button>
+    <p class="mt-5 mb-3 text-muted text-center">&copy; 2019</p>
+  </form>
+
+  <script>
+   function Redirect() {
+               window.location = "/signup";
+            }
+  </script>

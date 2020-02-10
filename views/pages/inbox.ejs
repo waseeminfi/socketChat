@@ -1,0 +1,349 @@
+
+<% layout('../layout/oneColumn') -%>
+
+<div class="messaging">
+    <div class="inbox_msg">
+        <div class="inbox_people">
+            <div class="headind_srch">
+                <div class="recent_heading">
+                    <h4>Recent</h4>
+                </div>
+                <div class="srch_bar">
+                    <div class="stylish-input-group">
+                        <input type="text" class="search-bar" placeholder="Search">
+                        <span class="input-group-addon">
+                            <button type="button"> <i class="fa fa-search" aria-hidden="true"></i> </button>
+                        </span> </div>
+                </div>
+            </div>
+            <div class="inbox_chat common-chatter" id="chatlist">
+
+            </div>
+        </div>
+        <div class="mesgs" style="display:none">
+
+            <div class="msg_history">
+                <div class="col-12 mb-3 pt-0 mt-0">
+                    <span id="username"></span>
+                </div>
+                <!-- <div class="incoming_msg">
+                    <div class="incoming_msg_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil">
+                    </div>
+                    <div class="received_msg">
+                        <div class="received_withd_msg">
+                            <p>Test which is a new approach to have all
+                                solutions</p>
+                            <span class="time_date"> 11:01 AM | June 9</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="outgoing_msg">
+                    <div class="sent_msg">
+                        <p>Test which is a new approach to have all
+                            solutions</p>
+                        <span class="time_date"> 11:01 AM | June 9</span>
+                    </div>
+                </div> -->
+            </div>
+            <div class="type_msg">
+                <span class="pencil_anim" style="display:none">Typing.....</span>
+                <div class="input_msg_write">
+                    <input type="text" class="write_msg" placeholder="Type a message"
+                        style="border:0; outline: none;" />
+                    <button class="msg_send_btn" type="button"><i class="fa fa-paper-plane-o"
+                            aria-hidden="true"></i></button>
+                </div>
+            </div>
+        </div>
+<div class="wrap_halfer">
+        <div class="all_friends common-chatter" id="friendlist">
+            <table id="friend_list" class="table admin_tables pull-left table-striped table-sm" ></table>
+        </div>
+        <div class="common-chatter" id="friendrequest">
+            <table id="friend_request" class="table admin_tables pull-left table-striped table-sm" ></table>
+        </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<script src="/js/socket.io.js"></script>
+<script src="/js/jquery-3.2.1.min.js"></script>
+<script src="/js/moment.min.js"></script>
+
+
+<script>
+    $("document").ready(function () {
+        var username = null;
+        var myname = '<%= user.uuid %>';
+        console.log(myname)
+        var socket = io();
+        socket.on('connect', function () {
+            //Add all controls here, instead of document load
+        });
+        socket.on('typing', function (data) {
+
+            if (myname != data.from) {
+                $(".pencil_anim").show();
+            }
+        });
+        socket.on('stoptyping', function (data) {
+            console.log('stoptyp'+data.from)
+            if (myname != data.from) {
+                $(".pencil_anim").hide();
+            }
+        });
+        socket.on("message", function (data) {
+            console.log('message',data,myname)
+            if (myname.trim() == data.from.trim()) {
+                $(".msg_history").append(
+                    `<div class="outgoing_msg">
+                    <div class="sent_msg">
+                        <p>${data.msg}</p>
+                        <span class="time_date"> ${moment().fromNow()}</span>
+                    </div>
+                </div>`
+                )
+            } else if (myname.trim() == data.to.trim()) {
+                $(".msg_history").append(
+                    `<div class="incoming_msg">
+                    <div class="incoming_msg_img"><img src="https://ptetutorials.com/images/user-profile.png" alt="${data.from}">
+                        <span class="username">${username}</span>
+                        </div>
+                    <div class="received_msg">
+                        <div class="received_withd_msg">
+                            <p>${data.msg}</p>
+                            <span class="time_date"> ${moment().fromNow()}</span>
+                        </div>
+                    </div>
+                </div>`
+                )
+            }
+            $(".pencil_anim").hide();
+        })
+        socket.on('newuser', function (data) {
+            if (data.name != username) {
+                //alert("new user joined")
+            }
+        })
+        socket.on('friendreq', function (data) {
+            console.log('friendreq',data)
+            if (data.to != myname) {
+                getAllFriendsRequest()
+            }
+        })
+        socket.on('newfriend', function (data) {
+            if (data.to == myname || data.from == myname) {
+                getAllFriends()
+            }
+        })
+        socket.on('disconnect', function () { });
+
+        $(".msg_send_btn").on("click", function () {
+            sendMessage();
+        })
+        $(".write_msg").keyup(function (event) {
+            console.log("writingg")
+            var data = $(".write_msg").val();
+            if (data == null || data == "") {
+                socket.emit('stoptyping', {
+                    from: myname
+                });
+                return;
+            }
+            socket.emit('typing', {
+                from: myname
+            });
+            if (event.which == 13) {
+                sendMessage()
+            }
+        })
+        function sendMessage() {
+            var data = $(".write_msg").val();
+            socket.emit('message', {
+                from: myname,
+                to: username,
+                msg: data
+            });
+            $(".write_msg").val("");
+        }
+
+        getAllFriends();
+        getAllUser();
+        getAllFriendsRequest();
+    });
+
+    function getAllFriends() {
+        console.log("getAllFriends")
+        var uid = '<%= user.uuid %>';
+        let _this = this;
+        $.ajax({
+            type: "GET",
+            url: "/friendlist/" + uid,
+            success: function (res) {
+                var ffrnd = res.data;
+                console.log("friendlist", res);
+                // chatlist(ffrnd);
+                _this.myFriends(ffrnd);
+            }
+        });
+    }
+
+    function getAllUser() {
+        console.log("getAllUser")
+        var uid = '<%= user.uuid %>';
+        let _this = this;
+        $.ajax({
+            type: "GET",
+            url: "/alluser/" + uid,
+            success: function (res) {
+                var ffrnd = res.data;
+                console.log("getAllUser", res);
+                // chatlist(ffrnd);
+                _this.allUsers(ffrnd);
+            }
+        });
+    }
+
+    function getAllFriendsRequest(){
+
+        let _this = this;
+        $.ajax({
+            type: "GET",
+            url: "/getFriendRequest",
+            success: function (res) {
+                var ffrnd = res.data;
+                console.log("getAllFriendsRequest", res);
+                _this.allFreindRequestUsers(ffrnd);
+
+            }
+        });
+    }
+    function myFriends(myyfrnd) {
+        var html = '';
+        if (myyfrnd) {
+            for (var i = 0; i < myyfrnd.length; i++) {
+                html += `<div class="chat_list">
+                     <div class="chat_people">
+                        <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil">
+                        </div>
+                        <div class="chat_ib">
+                            <h5>
+                              `+ myyfrnd[i].name + `
+                            </h5>
+                        </div>
+                        <input type="hidden" class="u" value="myyfrnd[i].id" />
+                    </div>
+                </div>`
+            }
+            $("#chatlist").append(html);
+            $(".pencil_anim").hide();
+            username = $(this).find(".chat_ib").text();
+
+            $(".chat_list").on('click', function () {
+                console.log("clicked")
+                $(".chat_list").removeClass("active_chat")
+                $(this).addClass("active_chat")
+                $("#username").html("Talking to <strong>" + $(this).find(".chat_ib").text() + "</strong>");
+                $(".mesgs").show();
+            })
+        }
+    }
+
+    function allUsers(alluser){
+        var html = '';
+        for (var i = 0; i < alluser.length; i++) {
+                html += `<div class="user_list">
+                     <div class="chat_people">
+                        <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil">
+                        </div>
+                        <div class="chat_ib">
+                            <h5>
+                              `+ alluser[i].name + `
+                            </h5>
+
+                             <img src="/assets/edit.svg" alt="edit icon" id="send" value= "`+alluser[i].uuid+`" />
+
+                        </div>
+                        </div>
+
+                        <input type="hidden" class="u" id="inputsend" value="`+alluser[i].uuid+`" />
+                    </div>
+                </div>`
+            }
+            $("#friendlist").append(html);
+            $("#send").click(function(){
+                console.log($("#inputsend").val())
+                sendRequest($("#inputsend").val());
+            })
+    }
+
+    function sendRequest(id){
+        console.log('user id : '+id)
+        console.log("getAllUser")
+        var socket = io();
+        let _this = this;
+        $.ajax({
+            type: "POST",
+            url: "/sendFriendRequest",
+            dataType : 'json',
+            data : {requesteeId : id},
+            success: function (res) {
+                socket.emit('newfriend',{to :id,from :'<%= user.uuid %>'})
+            }
+        });
+
+
+    }
+    function allFreindRequestUsers(friendrequser){
+        var html = '';
+        for (var i = 0; i < friendrequser.length; i++) {
+                html += `<div class="user_list">
+                     <div class="chat_people">
+                        <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil">
+                        </div>
+                        <div class="chat_ib">
+                            <h5>
+                              `+ friendrequser[i].name + `
+                            </h5>
+
+                             <img src="/assets/edit.svg" alt="edit icon" id="accept" value= "`+friendrequser[i].uuid+`" />
+
+                        </div>
+                        </div>
+
+                        <input type="hidden" class="u" id="inputaccept" value="`+friendrequser[i].uuid+`" />
+                    </div>
+                </div>`
+            }
+            $("#friendrequest").append(html);
+            $("#accept").click(function(){
+                console.log($("#inputaccept").val())
+                addFriendsRequest($("#inputaccept").val())
+
+            })
+    }
+
+    function addFriendsRequest(id){
+        console.log('user id : '+id)
+        var socket = io();
+        let _this = this;
+        $.ajax({
+            type: "POST",
+            url: "/addFriendsRequest",
+            dataType : 'json',
+            data : {Id : id},
+            success: function (res) {
+              socket.emit('newfriend',{to :id,from :'<%= user.uuid %>'})
+            }
+        });
+
+
+    }
+</script>
+
+<script>
+
+</script>
