@@ -62,7 +62,7 @@ module.exports = {
             return res.json({result : "Failed",message : "user name or Password is null"})
         }
         Users.create(body).then((result)=>{
-             res.redirect('/login');
+             res.json({result : "success",message : "User Created"})
         });
         // let fbody = {}
         // fbody.uuid = 'g2pcd6xsk2kahzc1';
