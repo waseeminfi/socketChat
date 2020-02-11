@@ -1,7 +1,10 @@
 const {
     Users,
+    Permissions,
+    Roles
 } = require(__basedir + '/models')
-
+const JWTStrategy = require('passport-jwt').Strategy
+const ExtractJWT = require('passport-jwt').ExtractJwt
 var LocalStrategy = require('passport-local').Strategy;
 
 const config = require(__basedir + '/config')
@@ -23,8 +26,7 @@ module.exports = function (passport) {
         Users.findOne({
             where: {
                 uuid: id
-            },
-            attributes: ["name", "uuid"]
+            }
         }).then(function (user) {
             done(null, user);
         }).error(function (err) {
@@ -34,33 +36,19 @@ module.exports = function (passport) {
 
 
 
-    passport.use('local', new LocalStrategy(
-        {
-            passReqToCallback: true
+    passport.use(new JWTStrategy({
+            jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
+            secretOrKey: 's3cr3t'
         },
-        function (req, username, password, done) {
-            return Users.findOne({
-                where: { username: req.body.username }
-            })
-                .then(user => {
-                    if (!user) {
-                        return done(null, false);
-
-                    }
-                    let isMatched = user.comparePassword(req.body.password);
-                    console.log("passport",isMatched);
-                    if (isMatched) {
-                        //console.log("permission",user.role.permission)
-                        return done(null, user);
-                    } else {
-                        return done(null, false
-                        );
-                    }
+        function (jwtPayload, cb) {
+            return Users.findOne({where:{uuid:jwtPayload.uuid}
                 })
-
+                .then(user => {
+                    //console.log("permission",user.role.permission)
+                    return cb(null, user);
+                })
                 .catch(err => {
-                    console.log("passport err",err);
-                    return done(err);
+                    return cb(err);
                 });
         }
     ));

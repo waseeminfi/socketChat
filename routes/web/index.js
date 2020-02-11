@@ -2,7 +2,8 @@
 const {
     AuthControllers,
     ChatControllers,
-    FriendsController
+    FriendsController,
+    UsersControllers
 } = require(__basedir + '/controllers');
 
 module.exports = (app,passport) => {
@@ -19,8 +20,8 @@ module.exports = (app,passport) => {
         res.render('pages/register');
     })
     
-    app.get('/friendlist/:id',isAuthenticated,ChatControllers.getFriendsList)
-    app.get('/alluser/:id',isAuthenticated,ChatControllers.getAllUsers);
+    app.get('/friendlist/:id',isAuthenticated,UsersControllers.getFriendsList)
+    app.get('/alluser/:id',isAuthenticated,UsersControllers.getAllUsers);
     app.post('/signup',isAuthenticated,AuthControllers.doSignUp)
     app.post('/sendFriendRequest',isAuthenticated,FriendsController.sentFriendRequest);
     app.get ('/getFriendRequest',isAuthenticated,FriendsController.getAllFriendRequest);
