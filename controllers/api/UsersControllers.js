@@ -3,7 +3,8 @@
 const {
     Users
 } = require(__basedir + "/models");
-
+var Sequelize = require('sequelize');
+const Op = Sequelize.Op;
 
 module.exports = {
     getFriendsList(req,res){
