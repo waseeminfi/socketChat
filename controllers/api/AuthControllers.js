@@ -26,8 +26,11 @@ module.exports = {
                     result: "Success",
                     message: "Successfully Logged In!!",
                     token: jwtSignUser(_user.get()),
+                    user: {id :_user.uuid, name: _user.name,}
                 });
             } else {
+                res.redirect('/login');
+                return;
                 res.json({
                     result: "Failed",
                     message: "Password Incorrect!"
