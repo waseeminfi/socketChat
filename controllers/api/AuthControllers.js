@@ -16,16 +16,18 @@ module.exports = {
             if(!_user){
 //                res.json({ result: "error", message: "User not exists" });
              console.log("user not exist")
-                res.redirect('/login');
+                res.json({result: "error", message: "User does not exists"});
                 return;
             }
             let isMatched = _user.comparePassword(_pass);
             console.log(isMatched);
             if (isMatched) {
-                res.redirect('/chatWindow');
+                res.json({
+                    result: "Success",
+                    message: "Successfully Logged In!!",
+                    token: jwtSignUser(_user.get()),
+                });
             } else {
-                res.redirect('/login');
-                return;
                 res.json({
                     result: "Failed",
                     message: "Password Incorrect!"

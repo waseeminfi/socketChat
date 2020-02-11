@@ -15,10 +15,7 @@ module.exports = (app,passport) => {
         res.render('pages/login');
     })
 
-    app.post('/login', passport.authenticate('local', {
-        successRedirect: '/chatWindow',
-        failureRedirect: '/login',
-      }));
+    app.post('/login', AuthControllers.doLogin);
     app.get('/signup',function(req,res){
         res.render('pages/register');
     })
