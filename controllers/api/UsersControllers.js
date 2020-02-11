@@ -31,9 +31,9 @@ module.exports = {
     },
     searchUsers(req,res){
         let _query = req.params.search;
-        Users.findAll({where :
-                {name : { [Op.like]: '%' + _query + '%'}
-            }}).then((_result)=>{
+        Users.findAll({
+                 where : {name : { [Op.like]: '%' + _query + '%'}},
+                 limit : 10}).then((_result)=>{
                 res.json(_result)
         }).error((err)=>{
             res.json([])
