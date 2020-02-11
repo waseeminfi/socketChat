@@ -20,13 +20,13 @@ module.exports = (app,passport) => {
         res.render('pages/register');
     })
     
-    app.get('/friendlist/:id',isLoggedIn,ChatControllers.getFriendsList)
-    app.get('/alluser/:id',isLoggedIn,ChatControllers.getAllUsers);
+    app.get('/friendlist/:id',ChatControllers.getFriendsList)
+    app.get('/alluser/:id',ChatControllers.getAllUsers);
     app.post('/signup',AuthControllers.doSignUp)
-    app.post('/sendFriendRequest',isLoggedIn,FriendsController.sentFriendRequest);
-    app.get ('/getFriendRequest',isLoggedIn,FriendsController.getAllFriendRequest);
-    app.post('/addFriendsRequest',isLoggedIn,FriendsController.addFriendsRequest)
-    app.get('/chatWindow',isLoggedIn,ChatControllers.renderChatWindow);
+    app.post('/sendFriendRequest',FriendsController.sentFriendRequest);
+    app.get ('/getFriendRequest',FriendsController.getAllFriendRequest);
+    app.post('/addFriendsRequest',FriendsController.addFriendsRequest)
+    app.get('/chatWindow',ChatControllers.renderChatWindow);
 
     app.get('/checkUserName/:uname',AuthControllers.checkUserName);
 }

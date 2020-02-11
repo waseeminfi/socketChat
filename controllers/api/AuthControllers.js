@@ -15,7 +15,7 @@ module.exports = {
         Users.findOne({ where: { username: _username }}).then((_user) => {
             if(!_user){
 //                res.json({ result: "error", message: "User not exists" });
-             console.log("user not exist")
+              console.log("user not exist")
                 res.json({result: "error", message: "User does not exists"});
                 return;
             }
