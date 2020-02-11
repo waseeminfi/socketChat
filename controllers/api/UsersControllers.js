@@ -8,8 +8,6 @@ const Op = Sequelize.Op;
 
 module.exports = {
     getFriendsList(req,res){
-        console.log('imhere');
-
         req.user.getFriends().then((_frnd)=>{
             res.json({status : 'success',data :_frnd});
         }).error((err)=>{
@@ -29,6 +27,16 @@ module.exports = {
             res.json({status : 'success',data :_frnd});
         }).error((err)=>{
             console.log("error",_frnd);
+        })
+    },
+    searchUsers(req,res){
+        let _query = req.params.search;
+        Users.findAll({where :
+                {name : { [Op.like]: '%' + _query + '%'}
+            }}).then((_result)=>{
+                res.json(_result)
+        }).error((err)=>{
+            res.json([])
         })
     }
 }

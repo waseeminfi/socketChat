@@ -27,7 +27,7 @@ module.exports = (app,passport) => {
     app.get ('/getFriendRequest',isAuthenticated,FriendsController.getAllFriendRequest);
     app.post('/addFriendsRequest',isAuthenticated,FriendsController.addFriendsRequest)
     app.get('/chatWindow',isAuthenticated,ChatControllers.renderChatWindow);
-
+    app.get('/user/:search',isAuthenticated,UsersControllers.searchUsers)
     app.get('/checkUserName/:uname',isAuthenticated,AuthControllers.checkUserName);
 }
 
