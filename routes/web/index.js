@@ -3,7 +3,8 @@ const {
     AuthControllers,
     ChatControllers,
     FriendsController,
-    UsersControllers
+    UsersControllers,
+    RoomControllers
 } = require(__basedir + '/controllers');
 
 module.exports = (app,passport) => {
@@ -29,6 +30,8 @@ module.exports = (app,passport) => {
     app.get('/chatWindow',isAuthenticated,ChatControllers.renderChatWindow);
     app.get('/user/:search',isAuthenticated,UsersControllers.searchUsers)
     app.get('/checkUserName/:uname',isAuthenticated,AuthControllers.checkUserName);
+    app.post('/room/',RoomControllers.roomHandling);
+    app.get('/getChat',isAuthenticated,UsersControllers.getChatListRoome)
 }
 
 

@@ -1,6 +1,7 @@
 const Promise = require('bluebird')
 const bcrypt = Promise.promisifyAll(require('bcrypt-nodejs'))
 
+
 function hashPassword(user, options) {
     const SALT_FACTOR = 8
     if (!user.changed('password')) {
@@ -26,7 +27,9 @@ function hashPasswordOnUpdate(options) {
             options.attributes.password = hash;
         });
 }
-
+const {
+    UsersRooms
+} = require(__basedir + "/models");
 module.exports = (sequelize, DataTypes) => {
     const Users = sequelize.define('Users', {
         username: {
@@ -92,6 +95,11 @@ module.exports = (sequelize, DataTypes) => {
             foreignKey: 'requesterId',
             onDelete: 'CASCADE'
         });
+
+        Users.belongsToMany(models.Rooms,{
+            as : 'rooms',
+            through : models.UsersRooms
+        })
     }
 
 

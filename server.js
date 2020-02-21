@@ -21,7 +21,9 @@ app.use(session({
   resave: true,
   saveUninitialized: true
 }));
-
+const {
+    RoomControllers
+} = require(__basedir + '/controllers');
   io.on('connection', function(socket){
     console.log('a user connected');
 
@@ -43,6 +45,15 @@ app.use(session({
       });
       socket.on('stoptyping',(data)=>{
         io.emit("stoptyping", data)
+      })
+
+      socket.on('sentmessage', (message) => {
+
+         // io.emit("recievemessage", message)
+      })
+
+      socket.on('room',(room)=>{
+         // io.emit("recievemessage", message)
       })
   });
   
@@ -94,7 +105,7 @@ app.use(function (err, req, res, next) {
 });
 
 sequelize.sync({
-    force: false
+    force: false,alter : false
 }).then(() => {
   http.listen(config.port)
       console.log(`Server started on port ${config.port}`)

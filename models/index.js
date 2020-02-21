@@ -26,7 +26,20 @@ Object.keys(db).forEach(function (modelName) {
   }
 })
 
-db.sequelize = sequelize
-db.Sequelize = Sequelize
+const mongoose = require(__basedir + '/helpers/mongoconnect');
+// loading mongo models
+fs
+    .readdirSync(__dirname + "/mongo")
+    .filter((file) =>
+        file !== 'index.js'
+    )
+    .forEach((file) => {
+      var moduleName = file.split('.')[0];
+      db[moduleName] = require(__dirname + "/mongo/" + moduleName);
+    })
+
+db.sequelize = sequelize;
+db.Sequelize = Sequelize;
+db.mongooose = mongoose;
 
 module.exports = db
